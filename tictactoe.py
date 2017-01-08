@@ -54,26 +54,48 @@ def is_valid_input(player_input):
             result = False
     return result
 
-initialize_board()
+def get_free_spaces():
+    free_spaces = []
+    for i in range(board_size):
+        for j in range(board_size):
+            if (board[i][j] is None):
+                free_spaces.append((i,j))
+    return tuple(free_spaces)
 
-round = 0
+def get_substate(player_id):
+    flatten_list_generator = (item for sublist in board for item in sublist)
+    binary_repr = "".join(map(lambda x: x == player_symbol[player_id] and '1' or '0', flatten_list_generator))
+    return int(binary_repr, 2)
 
-while(True):
-    print_board()
-    if (round > 8):
-        print("This is a draw!")
-        break
+def get_state(player_id):
+    other_players_id = int(not(player_id))
+    return (get_substate(player_id), get_substate(other_players_id))
 
-    which_player = round % 2
-    print("Player {}: ".format(which_player + 1), end="")
-    player_input = raw_input()
-    if not(is_valid_input(player_input)):
-        continue
-    row, col = map(lambda x: int(x) - 1, player_input)
-    board[row][col] = player_symbol[which_player]
-    if (have_we_a_winner()):
+def main():
+    initialize_board()
+    round = 0
+
+    while(True):
         print_board()
-        print("Player {} is the winner!".format(which_player + 1))
-        break
-    round += 1
-    print()
+        if (round > 8):
+            print("This is a draw!")
+            break
+    
+        which_player = round % 2
+        print(get_free_spaces())
+        print("State: {}".format(get_state(which_player)))
+        print("Player {}: ".format(which_player + 1), end="")
+        player_input = raw_input()
+        if not(is_valid_input(player_input)):
+            continue
+        row, col = map(lambda x: int(x) - 1, player_input)
+        board[row][col] = player_symbol[which_player]
+        if (have_we_a_winner()):
+            print_board()
+            print("Player {} is the winner!".format(which_player + 1))
+            break
+        round += 1
+        print()
+
+if __name__ == '__main__':
+    main()
