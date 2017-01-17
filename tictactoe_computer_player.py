@@ -1,6 +1,9 @@
 from __future__ import print_function
 
+import copy
 import random
+
+from tictactoe_player import TicTacToePlayer
 
 
 class TicTacToeComputerPlayer(TicTacToePlayer):
@@ -37,14 +40,52 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         return (my_seats, other_seats)
 
 
-    def __init_q_values(self, game_state):
+    def __combine_state_seat_and_encode(self, game_state, free_seat):
+        next_game_state = copy.deepcopy(game_state)
+        next_game_state[free_seat[0]][free_seat[1]] = self.player_id
+        next_encoded_game_state = self.__encode_state(next_game_state)
+        return next_game_state
+
+
+    def __init_q_values(self, game_state, be_recursive=True):
         encoded_state = self.__encode_state(game_state)
         if (encoded_state not in self.q_values):
             self.q_values[encoded_state] = self.INITIAL_VALUE
-            for free_seat in self.__get_free_seats(game_state):
-                self.q_values[]
+            if (be_recursive):
+                for free_seat in self.__get_free_seats(game_state):
+                    next_encoded_game_state = self.__combine_state_seat_and_encode(game_state, free_seat)
+                    self.__init_q_values(next_encoded_game_state, be_recursive=False)
+
+
+    def __get_next_greedy_move(self, game_state):
+        best_move = None
+        best_score = None
+        for free_seat in self.__get_free_seats(game_state):
+            next_game_state = self.__combine_state_seat_and_encode(game_state, free_seat)
+            next_game_state_score = self.q_values[next_game_state]
+            if (best_score is None):
+                best_score = next_game_state_score
+                best_move = free_seat
+                continue
+            if (next_game_state_score > best_score):
+                best_score = next_game_state_score
+                best_move = free_seat
+        return best_move
+
+
+    def _get_next_random_move(self, game_state):
+        return random.choice(self.__get_free_seats(game_state))
+
 
     def get_next_move(self, game_state):
+        next_move = None
+        self.__init_q_values(game_state)
+        if (random.random() > self.epsilon):
+            next_move = self.__get_next_random_move(game_state)
+        else:
+            next_move = self.__get_next_greedy_move(game_state)
+        self.prev_game_state = game_state
+        return next_move
 
 
     def set_reward_for_last_move(self, reward):
