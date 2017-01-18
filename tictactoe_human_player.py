@@ -9,6 +9,7 @@ class TicTacToeHumanPlayer(TicTacToePlayer):
         self.player_id = player_id
         return
 
+
     def get_next_move(self, game_state):
         print("Player {}: ".format(self.player_id), end="")
         player_input = raw_input()
@@ -16,3 +17,5 @@ class TicTacToeHumanPlayer(TicTacToePlayer):
         return (row, col)
 
 
+    def end_of_game(self, winning_player_id):
+        return

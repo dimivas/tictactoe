@@ -7,6 +7,9 @@ from tictactoe_computer_player import TicTacToeComputerPlayer
 
 class TicTacToeGame(object):
 
+    RESULT_DRAW = None
+
+
     def __init__(self, p1, p2, board_size=3, player_symbol=('X', 'O')):
         self.board_size = board_size
         self.player_symbol = player_symbol
@@ -85,6 +88,7 @@ class TicTacToeGame(object):
             self.print_board()
             if (round > 8):
                 print("This is a draw!")
+                map(lambda x: x.end_of_game(self.RESULT_DRAW), self.players)
                 break
             which_player = round % 2
             row, col = self.players[which_player].get_next_move(self.board)
@@ -96,9 +100,12 @@ class TicTacToeGame(object):
             if (self.__have_we_a_winner((row, col))):
                 self.print_board()
                 print("Player {} is the winner!".format(which_player + 1))
+
+                winning_player_symbol = self.player_symbol[which_player]
+                map(lambda x: x.end_of_game(winning_player_symbol), self.players)
                 break
             round += 1
         print()
 
 if __name__ == '__main__':
-   TicTacToeGame(TicTacToeHumanPlayer('X'), TicTacToeHumanPlayer('O')).play()
+   TicTacToeGame(TicTacToeHumanPlayer('X'), TicTacToeComputerPlayer('O')).play()
