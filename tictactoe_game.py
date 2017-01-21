@@ -1,9 +1,10 @@
 from __future__ import print_function
 
+from datetime import datetime
+import logging
 import os
+import time
 
-from tictactoe_human_player import TicTacToeHumanPlayer
-from tictactoe_computer_player import TicTacToeComputerPlayer
 
 class TicTacToeGame(object):
 
@@ -14,6 +15,7 @@ class TicTacToeGame(object):
         self.board_size = board_size
         self.player_symbol = player_symbol
         self.players = (p1, p2)
+        self.game_id = 0
 
         self.__init_board()
 
@@ -42,10 +44,22 @@ class TicTacToeGame(object):
     """
 
     def __is_seat_occupied(self, row, col):
+        """
+        Is seat occupied
+        @param row: Number of row
+        @param col: Number of row
+        @return: Boolean
+        """
         return self.board[row][col] is not None
 
 
     def __is_input_valid(self, row, col):
+        """
+        Is input valid
+        @param row
+        @param col
+        @return: Boolean
+        """
         result = True
         if not(str(row).isdigit()) or not(str(col).isdigit()):
             result = False
@@ -82,12 +96,28 @@ class TicTacToeGame(object):
         return result
 
 
-    def play(self):
+    def __end_of_game(self, winning_player, be_verbose=True):
+        """
+        End of game
+        @param winning_player: Either the first (0) or the second (1) player
+        @param be_verbose: Boolean for being verbose or not
+        """
+        be_verbose and self.print_board()
+        be_verbose and print("Game {}: Player {} is the winner!".format(self.game_id, winning_player + 1))
+        winning_player_symbol = self.player_symbol[winning_player]
+        map(lambda x: x.end_of_game(winning_player_symbol), self.players)
+
+
+    def play(self, be_verbose=True):
+        """
+        Play
+        @param be_verbose: Boolean for being verbose or not
+        """
         round = 0
         while(True):
-            self.print_board()
+            be_verbose and self.print_board()
             if (round > 8):
-                print("This is a draw!")
+                be_verbose and print("Game {}: This is a draw!".format(self.game_id))
                 map(lambda x: x.end_of_game(self.RESULT_DRAW), self.players)
                 break
             which_player = round % 2
@@ -98,14 +128,7 @@ class TicTacToeGame(object):
             col = int(col)
             self.board[row][col] = self.player_symbol[which_player]
             if (self.__have_we_a_winner((row, col))):
-                self.print_board()
-                print("Player {} is the winner!".format(which_player + 1))
-
-                winning_player_symbol = self.player_symbol[which_player]
-                map(lambda x: x.end_of_game(winning_player_symbol), self.players)
+                self.__end_of_game(which_player, be_verbose=be_verbose)
                 break
             round += 1
-        print()
 
-if __name__ == '__main__':
-   TicTacToeGame(TicTacToeHumanPlayer('X'), TicTacToeComputerPlayer('O')).play()
