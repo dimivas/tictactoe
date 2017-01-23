@@ -113,6 +113,9 @@ class TicTacToeGame(object):
         Play
         @param be_verbose: Boolean for being verbose or not
         """
+        #self.players[0].set_player_id(self.player_symbol[0])
+        #self.players[1].set_player_id(self.player_symbol[1])
+        map(lambda x: self.players[x].set_player_id(self.player_symbol[x]), range(len(self.players)))
         round = 0
         while(True):
             be_verbose and self.print_board()

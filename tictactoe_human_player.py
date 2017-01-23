@@ -5,9 +5,8 @@ from tictactoe_player import TicTacToePlayer
 
 class TicTacToeHumanPlayer(TicTacToePlayer):
 
-    def __init__(self, player_id):
-        self.player_id = player_id
-        return
+    def __init__(self):
+        self.player_id = None
 
 
     def __get_next_move(self, game_state):
@@ -29,4 +28,8 @@ class TicTacToeHumanPlayer(TicTacToePlayer):
 
 
     def end_of_game(self, winning_player_id):
-        return
+        self.player_id = None
+
+
+    def set_player_id(self, player_id):
+        self.player_id = player_id

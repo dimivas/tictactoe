@@ -20,11 +20,10 @@ def update_progress(progress, start_time):
             
         print('\r[{0}] {1}% {2}     '.format(('#'*perc_progress).ljust(100), perc_progress, eta), end='')
 
-
 print(">>> TRAINING MODE (COM vs COM) <<<")
 num_of_training_games = 50000
-p1 = TicTacToeComputerPlayer('X')
-p2 = TicTacToeComputerPlayer('O')
+p1 = TicTacToeComputerPlayer()
+p2 = TicTacToeComputerPlayer()
 os.system('setterm -cursor off')
 try:
     start_time = datetime.now()
@@ -34,10 +33,12 @@ try:
 finally:
     os.system('setterm -cursor on')
 print('\n\n')
+p2.get_q_values_from_other_com(p1)
 p2.be_verbose = True
-h1 = TicTacToeHumanPlayer('X')
+p2.epsilon = 0.0
+h1 = TicTacToeHumanPlayer()
 while(True):
     time.sleep(2)
     TicTacToeGame(h1, p2).play()
     time.sleep(2)
-    TicTacToeGame(p1, h1).play()
+    TicTacToeGame(p2, h1).play()

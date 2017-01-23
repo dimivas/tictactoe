@@ -15,15 +15,16 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
     DRAW_WINNING_STAKE = 0.5
 
 
-    def __init__(self, player_id, alpha=0.99, epsilon=1.0, epsilon_step=10e-5, min_epsilon=0.0, be_verbose=False):
-        self.player_id = player_id
-        self.q_values = {}
+    def __init__(self, alpha=0.99, epsilon=1.0, epsilon_step=10e-5, min_epsilon=0.0, be_verbose=False):
         self.alpha = alpha
         self.epsilon = epsilon
         self.epsilon_step = epsilon_step
         self.min_epsilon = min_epsilon
-        self.prev_game_state = None
         self.be_verbose = be_verbose
+
+        self.q_values = {}
+        self.prev_game_state = None
+        self.player_id = None
 
 
     def __combine_state_and_seat(self, game_state, free_seat):
@@ -39,8 +40,8 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
     def __encode_state(self, game_state):
         flatten_list = list(item for sublist in game_state for item in sublist)
         my_seats = self.__get_binary_repr(flatten_list, lambda x: x == self.player_id)
-        other_seats = self.__get_binary_repr(flatten_list, lambda x: x and x != self.player_id)
-        return (my_seats, other_seats)
+        opponent_seats = self.__get_binary_repr(flatten_list, lambda x: x and x != self.player_id)
+        return (my_seats, opponent_seats)
 
 
     def __get_binary_repr(self, flatten_game_state, filter_func):
@@ -87,11 +88,11 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         self.be_verbose and print("Encoded State: {}".format(encoded_state))
         if (encoded_state not in self.q_values):
             self.q_values[encoded_state] = self.INITIAL_STATE_VALUE
-            if (be_recursive):
-                self.be_verbose and print("Free Seats: {}".format(self.__get_free_seats(game_state)))
-                for free_seat in self.__get_free_seats(game_state):
-                    next_encoded_game_state = self.__combine_state_and_seat(game_state, free_seat)
-                    self.__init_q_values(next_encoded_game_state, be_recursive=False)
+        if (be_recursive):
+            self.be_verbose and print("Free Seats: {}".format(self.__get_free_seats(game_state)))
+            for free_seat in self.__get_free_seats(game_state):
+                next_game_state = self.__combine_state_and_seat(game_state, free_seat)
+                self.__init_q_values(next_game_state, be_recursive=False)
 
 
     def __reset_state(self):
@@ -135,4 +136,12 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         return next_move
 
 
+    def set_player_id(self, player_id):
+        self.player_id = player_id
 
+
+    def get_q_values_from_other_com(self, com_player):
+        assert(isinstance(com_player, TicTacToeComputerPlayer))
+        for game_state in com_player.q_values:
+            if game_state not in self.q_values:
+                self.q_values[game_state] = com_player.q_values[game_state]
