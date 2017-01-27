@@ -32,10 +32,10 @@ class TicTacToeGame(object):
         Prints the game board with the current state
         """
         os.system('clear')
-        print("  0 1 2")
-        for line in range(self.board_size):
-            print("{} ".format(line), end='')
-            print(" ".join(map(lambda x: x and str(x) or '-', self.board[line])))
+        print("  {}".format(" ".join(str(x) for x in range(self.board_size))))
+        for line_id in range(self.board_size):
+            line_state = " ".join(map(lambda x: x and str(x) or '-', self.board[line_id])))
+            print("{} {}".format(line_id, line_state)
         print()
 
 
@@ -46,9 +46,9 @@ class TicTacToeGame(object):
     def __is_seat_occupied(self, row, col):
         """
         Is seat occupied
-        @param row: Number of row
-        @param col: Number of row
-        @return: Boolean
+        @param row (int): Number of row
+        @param col (int): Number of col
+        @return (bool)
         """
         return self.board[row][col] is not None
 
@@ -56,9 +56,9 @@ class TicTacToeGame(object):
     def __is_input_valid(self, row, col):
         """
         Is input valid
-        @param row
-        @param col
-        @return: Boolean
+        @param row (int): Number of row
+        @param col (int): Number of col
+        @return (bool) 
         """
         result = True
         if not(str(row).isdigit()) or not(str(col).isdigit()):
@@ -79,10 +79,10 @@ class TicTacToeGame(object):
     def __have_we_a_winner(self, last_move):
         """
         Check if there is a winner
-        @param last_move: tuple/list with row and column number of the last move (e.g. (1, 2))
-        @return None in case noone wins or the character of the player that wins
+        @param last_move (tuple): tuple/list with row and column number of the last move (e.g. (1, 2))
+        @return (bool)
         """
-        result = None
+        result = False
         row, col = last_move
         for i in range(self.board_size):
             if (self.board[i][0] and self.board[i][0] == self.board[i][1] and self.board[i][0] == self.board[i][2]):
@@ -99,8 +99,8 @@ class TicTacToeGame(object):
     def __end_of_game(self, winning_player, be_verbose=True):
         """
         End of game
-        @param winning_player: Either the first (0) or the second (1) player
-        @param be_verbose: Boolean for being verbose or not
+        @param winning_player (int): Either the first (0) or the second (1) player
+        @param be_verbose (bool): Boolean for being verbose or not
         """
         be_verbose and self.print_board()
         be_verbose and print("Game {}: Player {} is the winner!".format(self.game_id, winning_player + 1))
@@ -111,10 +111,8 @@ class TicTacToeGame(object):
     def play(self, be_verbose=True):
         """
         Play
-        @param be_verbose: Boolean for being verbose or not
+        @param be_verbose (bool): Boolean for being verbose or not
         """
-        #self.players[0].set_player_id(self.player_symbol[0])
-        #self.players[1].set_player_id(self.player_symbol[1])
         map(lambda x: self.players[x].set_player_id(self.player_symbol[x]), range(len(self.players)))
         round = 0
         while(True):

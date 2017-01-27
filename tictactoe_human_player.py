@@ -31,5 +31,5 @@ class TicTacToeHumanPlayer(TicTacToePlayer):
         self.player_id = None
 
 
-    def set_player_id(self, player_id):
-        self.player_id = player_id
+#    def set_player_id(self, player_id):
+#        self.player_id = player_id

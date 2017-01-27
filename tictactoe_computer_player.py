@@ -136,12 +136,12 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         return next_move
 
 
-    def set_player_id(self, player_id):
-        self.player_id = player_id
-
-
     def get_q_values_from_other_com(self, com_player):
         assert(isinstance(com_player, TicTacToeComputerPlayer))
         for game_state in com_player.q_values:
             if game_state not in self.q_values:
                 self.q_values[game_state] = com_player.q_values[game_state]
+
+
+#    def set_player_id(self, player_id):
+#        self.player_id = player_id
