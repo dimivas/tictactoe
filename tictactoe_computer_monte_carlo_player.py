@@ -24,7 +24,7 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         self.be_verbose = be_verbose
 
         self.q_values = {}
-        self.prev_game_state = None
+        self.game_moves_history = []
         self.player_id = None
 
 
@@ -86,7 +86,8 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
 
 
     def __reset_state(self):
-        self.prev_game_state = None
+        self.game_moves_history = []
+        self.set_player_id = None
 
 
     def __update_epsilon(self):
@@ -94,11 +95,10 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
 
 
     def __update_q_values(self, reward):
-        if (self.prev_game_state):
-            state, move = self.prev_game_state
-            value, times_passed = self.q_values[state][move]
+        for encoded_game_state, move in self.game_moves_history:
+            value, times_passed = self.q_values[encoded_game_state][move]
             new_value = (value * times_passed + float(reward)) / (times_passed + 1)
-            self.q_values[state][move] = (new_value, times_passed + 1)
+            self.q_values[encoded_game_state][move] = (new_value, times_passed + 1)
 
 
     def end_of_game(self, winning_player_id):
@@ -123,10 +123,7 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         else:
             next_move = self.__get_next_greedy_move(game_state)
 
-        next_move_score = self.__get_score(game_state, next_move)
-        self.__update_q_values(next_move_score)
-
-        self.prev_game_state = (encoded_game_state, next_move)
+        self.game_moves_history.append((encoded_game_state, next_move))
 
         return next_move
 
