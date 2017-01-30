@@ -34,8 +34,8 @@ class TicTacToeGame(object):
         os.system('clear')
         print("  {}".format(" ".join(str(x) for x in range(self.board_size))))
         for line_id in range(self.board_size):
-            line_state = " ".join(map(lambda x: x and str(x) or '-', self.board[line_id])))
-            print("{} {}".format(line_id, line_state)
+            line_state = " ".join(map(lambda x: x and str(x) or '-', self.board[line_id]))
+            print("{} {}".format(line_id, line_state))
         print()
 
 
