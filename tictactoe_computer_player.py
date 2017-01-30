@@ -14,12 +14,14 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
     OPPONENT_WINNING_STAKE = 0.0
     DRAW_WINNING_STAKE = 0.5
 
+    COM_PLAYER_ID = 1
+    OPPONENT_PLAYER_ID = 2
 
-    def __init__(self, alpha=0.99, epsilon=1.0, epsilon_step=10e-5, min_epsilon=0.0, be_verbose=False):
+
+    def __init__(self, alpha=0.99, epsilon=1.0, epsilon_decay_step=0.999, be_verbose=False):
         self.alpha = alpha
         self.epsilon = epsilon
-        self.epsilon_step = epsilon_step
-        self.min_epsilon = min_epsilon
+        self.epsilon_decay_step = epsilon_decay_step
         self.be_verbose = be_verbose
 
         self.q_values = {}
@@ -33,21 +35,10 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         return next_game_state
 
 
-    def __convert_nested_list_to_tuple(self, nested_list):
-        return tuple(map(lambda x: tuple(x), nested_list))
-
-
     def __encode_state(self, game_state):
         flatten_list = list(item for sublist in game_state for item in sublist)
-        my_seats = self.__get_binary_repr(flatten_list, lambda x: x == self.player_id)
-        opponent_seats = self.__get_binary_repr(flatten_list, lambda x: x and x != self.player_id)
-        return (my_seats, opponent_seats)
-
-
-    def __get_binary_repr(self, flatten_game_state, filter_func):
-        filtered_values = map(filter_func, flatten_game_state)
-        binary_repr = "".join(map(lambda x: x and '1' or '0', filtered_values))
-        return int(binary_repr, 2)
+        encoded_state = tuple(map(self.__map_player_id, flatten_list))
+        return encoded_state
 
 
     def __get_free_seats(self, game_state):
@@ -83,16 +74,24 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         return self.q_values[self.__encode_state(next_game_state)]
 
 
-    def __init_q_values(self, game_state, be_recursive=True):
+    def __init_q_values(self, game_state):
         encoded_state = self.__encode_state(game_state)
-        self.be_verbose and print("Encoded State: {}".format(encoded_state))
         if (encoded_state not in self.q_values):
             self.q_values[encoded_state] = self.INITIAL_STATE_VALUE
-        if (be_recursive):
-            self.be_verbose and print("Free Seats: {}".format(self.__get_free_seats(game_state)))
-            for free_seat in self.__get_free_seats(game_state):
-                next_game_state = self.__combine_state_and_seat(game_state, free_seat)
-                self.__init_q_values(next_game_state, be_recursive=False)
+        for free_seat in self.__get_free_seats(game_state):
+            next_encoded_state = self.__encode_state(self.__combine_state_and_seat(game_state, free_seat))
+            if (next_encoded_state not in self.q_values):
+                self.q_values[next_encoded_state] = self.INITIAL_STATE_VALUE
+
+
+    def __map_player_id(self, seat):
+        internal_player_id = None
+        if (seat):
+            if (seat == self.player_id):
+                internal_player_id = self.COM_PLAYER_ID
+            else:
+                internal_player_id = self.OPPONENT_PLAYER_ID
+        return internal_player_id
 
 
     def __reset_state(self):
@@ -100,12 +99,11 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
 
 
     def __update_epsilon(self):
-        self.epsilon = max(self.epsilon - self.epsilon_step, self.min_epsilon)
+        self.epsilon *= self.epsilon_decay_step
 
 
     def __update_q_values(self, reward):
         if (self.prev_game_state):
-            # V(s) <- V(s) + alpha * [ V(s') - V(s) ]
             self.q_values[self.prev_game_state] += self.alpha * (reward - self.q_values[self.prev_game_state])
 
 
@@ -143,5 +141,5 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
                 self.q_values[game_state] = com_player.q_values[game_state]
 
 
-#    def set_player_id(self, player_id):
-#        self.player_id = player_id
+    def set_player_id(self, player_id):
+        self.player_id = player_id
