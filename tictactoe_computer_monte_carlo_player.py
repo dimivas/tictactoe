@@ -87,7 +87,7 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
 
     def __reset_state(self):
         self.game_moves_history = []
-        self.set_player_id = None
+        self.player_id = None
 
 
     def __update_epsilon(self):
