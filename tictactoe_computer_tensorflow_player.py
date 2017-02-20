@@ -27,6 +27,7 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         self.be_verbose = be_verbose
 
         self.player_id = None
+        self.prev_game_state = None
 
         self.board_size = board_size
         self.hidden_layer_size = hidden_layer_size
@@ -36,11 +37,13 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
 
 
     def __get_q_values(self, splitted_states):
-        return self.q_values_nn.eval(session=self.session, feed_dict={self.s: [splitted_states]})[0]
+        res = self.q_values_nn.eval(session=self.session, feed_dict={self.s: [splitted_states]})[0]
+        #print('RES:{}'.format(res))
+        return res
 
 
-    def __update_q_values(self, s, s_t, a, a_t, y, y_t):
-        self.session.run(self.q_updater, feed_dict={s: s_t, a: a_t, y: y_t})
+    def __update_q_values(self, s_t, a_t, y_t):
+        self.session.run(self.q_updater, feed_dict={self.s: s_t, self.a: a_t, self.y: y_t})
 
 
     def __build_graph(self):
@@ -66,6 +69,7 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
 
     def __reset_state(self):
         self.player_id = None
+        self.prev_game_state = None
 
 
     def __map_player_id(self, seat):
@@ -81,6 +85,17 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
 
 
     def end_of_game(self, winning_player_id):
+        reward = self.DRAW_REWARD
+        if (winning_player_id == self.player_id):
+            reward = self.COM_WIN_REWARD
+        elif (winning_player_id):
+            reward = self.COM_LOSS_PENALTY
+
+        prev_splitted_states, prev_move_t = self.prev_game_state
+        prev_splitted_states = [prev_splitted_states]
+        prev_move_t = [prev_move_t]
+        self.__update_q_values(prev_splitted_states, prev_move_t, [reward] * len(prev_splitted_states))
+        
         self.__reset_state()
 
 
@@ -110,14 +125,26 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         splitted_states = self.__split_states(encoded_state)
         q_values = self.__get_q_values(splitted_states)
 
-        best_greedy_move = tuple(free_seats_t[np.argmax(q_values[free_seats])])
+        best_next_move = tuple(free_seats_t[np.argmax(q_values[free_seats])])
 
         if np.random.random() < self.epsilon:
             next_move = tuple(free_seats_t[np.random.randint(len(free_seats_t))])
             self.__update_epsilon()
         else:
-            next_move = best_greedy_move
+            next_move = best_next_move
 
+        if self.prev_game_state:
+            prev_splitted_states, prev_move_t = self.prev_game_state
+            y_t_prev = 0. + 0.8 * q_values[best_next_move]
+            prev_splitted_states = [prev_splitted_states]
+            prev_move_t = [prev_move_t]
+            self.__update_q_values(prev_splitted_states, prev_move_t, [y_t_prev] * len(prev_splitted_states))
+
+
+        next_move_t = np.zeros_like(encoded_state, dtype=np.float32)
+        next_move_t[next_move] = 1.
+	
+        self.prev_game_state = (splitted_states, next_move_t) 
         return next_move
 
 
