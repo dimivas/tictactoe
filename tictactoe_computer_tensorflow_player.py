@@ -21,7 +21,7 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
     OPPONENT_PLAYER_ID = 2
 
 
-    def __init__(self, epsilon=1.0, epsilon_decay_step=0.999, board_size=3, hidden_layer_size=50, be_verbose=False):
+    def __init__(self, epsilon=1.0, epsilon_decay_step=0.9999, board_size=3, hidden_layer_size=50, be_verbose=False):
         self.epsilon = epsilon
         self.epsilon_decay_step = epsilon_decay_step
         self.be_verbose = be_verbose
@@ -38,7 +38,6 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
 
     def __get_q_values(self, splitted_states):
         res = self.q_values_nn.eval(session=self.session, feed_dict={self.s: [splitted_states]})[0]
-        #print('RES:{}'.format(res))
         return res
 
 

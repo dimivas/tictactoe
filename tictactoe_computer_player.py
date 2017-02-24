@@ -7,7 +7,7 @@ import time
 from tictactoe_player import TicTacToePlayer
 
 
-class TicTacToeComputerPlayer(TicTacToePlayer):
+class TicTacToeCComputerPlayer(TicTacToePlayer):
 
     INITIAL_STATE_VALUE = 0.5
     COM_WINNING_STAKE = 1.0
@@ -18,7 +18,7 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
     OPPONENT_PLAYER_ID = 2
 
 
-    def __init__(self, alpha=0.99, epsilon=1.0, epsilon_decay_step=0.999, be_verbose=False):
+    def __init__(self, alpha=0.99, epsilon=1.0, epsilon_decay_step=0.9999, be_verbose=False):
         self.alpha = alpha
         self.epsilon = epsilon
         self.epsilon_decay_step = epsilon_decay_step

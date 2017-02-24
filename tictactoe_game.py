@@ -11,13 +11,16 @@ class TicTacToeGame(object):
     RESULT_DRAW = None
 
 
-    def __init__(self, p1, p2, board_size=(6, 7), win_size=4, player_symbol=('X', 'O')):
+    def __init__(self, p1, p2, board_size=(3, 3), win_size=3, player_symbol=('X', 'O'), be_verbose=True):
         self.board_size = board_size
         self.win_size = win_size
         self.player_symbol = player_symbol
+        self.be_verbose = be_verbose
+
         self.players = (p1, p2)
         self.game_id = 0
 
+        map(lambda x: self.players[x].set_player_id(self.player_symbol[x]), range(len(self.players)))
         self.__init_board()
 
 
@@ -32,6 +35,8 @@ class TicTacToeGame(object):
         """
         Prints the game board with the current state
         """
+        if not self.be_verbose:
+            return
         os.system('clear')
         print("  {}".format(" ".join(str(x) for x in range(self.board_size[1]))))
         for line_id in range(self.board_size[0]):
@@ -127,33 +132,32 @@ class TicTacToeGame(object):
         return False
 
 
-    def __end_of_game(self, winning_player, be_verbose=True):
+    def __end_of_game(self, winning_player):
         """
         End of game
         @param winning_player (int): Either the first (0) or the second (1) player
-        @param be_verbose (bool): Boolean for being verbose or not
         """
-        be_verbose and self.print_board()
-        be_verbose and print("Game {}: Player {} is the winner!".format(self.game_id, winning_player + 1))
-        winning_player_symbol = self.player_symbol[winning_player]
-        map(lambda x: x.end_of_game(winning_player_symbol), self.players)
+        self.print_board()
+        if winning_player is not self.RESULT_DRAW:        
+            self.be_verbose and print("Game {}: Player {} is the winner!".format(self.game_id, winning_player + 1))
+            winning_player_symbol = self.player_symbol[winning_player]
+            map(lambda x: x.end_of_game(winning_player_symbol), self.players)
+        else:
+            self.be_verbose and print("Game {}: This is a draw!".format(self.game_id))
+            map(lambda x: x.end_of_game(self.RESULT_DRAW), self.players)          
+        self.__init_board()
 
 
-    def play(self, be_verbose=True):
+    def play(self):
         """
-        Play
-        @param be_verbose (bool): Boolean for being verbose or not
+        Let's play ball
         """
-        map(lambda x: self.players[x].set_player_id(self.player_symbol[x]), range(len(self.players)))
-
-        round = 0
+        result = self.RESULT_DRAW
+        turn = 0
+        self.game_id += 1
         while(True):
-            be_verbose and self.print_board()
-            if (round >= self.board_size[0] * self.board_size[1]):
-                be_verbose and print("Game {}: This is a draw!".format(self.game_id))
-                map(lambda x: x.end_of_game(self.RESULT_DRAW), self.players)
-                break
-            which_player = round % 2
+            self.print_board()
+            which_player = turn % 2
             row, col = self.players[which_player].get_next_move(self.board)
             if not(self.__is_input_valid(row, col)):
                 continue
@@ -161,7 +165,11 @@ class TicTacToeGame(object):
             col = int(col)
             self.board[row][col] = self.player_symbol[which_player]
             if (self.__have_we_a_winner((row, col))):
-                self.__end_of_game(which_player, be_verbose=be_verbose)
+                self.__end_of_game(which_player)
+                result = which_player
                 break
-            round += 1
-
+            turn += 1
+            if (turn >= self.board_size[0] * self.board_size[1]):
+                self.__end_of_game(None)
+                break
+        return result
