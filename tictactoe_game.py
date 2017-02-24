@@ -67,16 +67,16 @@ class TicTacToeGame(object):
         @return (bool) 
         """
         result = True
-        if not(str(row).isdigit()) or not(str(col).isdigit()):
+        if not str(row).isdigit() or not str(col).isdigit():
             result = False
         else:
             row = int(row)
             col = int(col)
-            if (row < 0 or row >= self.board_size[0]):
+            if row < 0 or row >= self.board_size[0]:
                 result = False
-            if (col < 0 or col >= self.board_size[1]):
+            if col < 0 or col >= self.board_size[1]:
                 result = False
-        if (result == True):
+        if result:
             if self.__is_seat_occupied(row, col):
                 result = False
         return result
@@ -86,7 +86,7 @@ class TicTacToeGame(object):
         """
         """
         result = False
-        if (row[0] and all(map(lambda x: x == row[0], row))):
+        if row[0] and all(map(lambda x: x == row[0], row)):
             result = True
         return result
 
@@ -96,18 +96,18 @@ class TicTacToeGame(object):
         """
         # Left to right cross
         left_cross = map(lambda x: self.board[start_row + x][start_col + x], range(self.win_size))
-        if (self.__have_we_a_winner_in_row(left_cross)):
+        if self.__have_we_a_winner_in_row(left_cross):
             return True
         # Right to left cross
         right_cross = map(lambda x: self.board[start_row + x][start_col + self.win_size - 1 - x], range(self.win_size))
-        if (self.__have_we_a_winner_in_row(right_cross)):
+        if self.__have_we_a_winner_in_row(right_cross):
             return True
         for i in range(self.win_size):
             offset_row = self.board[i + start_row][start_col:start_col + self.win_size]
-            if (self.__have_we_a_winner_in_row(offset_row)):
+            if self.__have_we_a_winner_in_row(offset_row):
                 return True
             offset_col = map(lambda x: x[i + start_col], self.board[start_row:start_row + self.win_size])
-            if (self.__have_we_a_winner_in_row(offset_col)):
+            if self.__have_we_a_winner_in_row(offset_col):
                 return True
         return False
 
@@ -126,7 +126,7 @@ class TicTacToeGame(object):
 
         for i in range(x_start, x_end - (self.win_size - 2)):
             for j in range(y_start, y_end - (self.win_size - 2)):
-                if (self.__have_we_a_winner_in_square(i, j)):
+                if self.__have_we_a_winner_in_square(i, j):
                     return True
 
         return False
@@ -155,21 +155,21 @@ class TicTacToeGame(object):
         result = self.RESULT_DRAW
         turn = 0
         self.game_id += 1
-        while(True):
+        while True:
             self.print_board()
             which_player = turn % 2
             row, col = self.players[which_player].get_next_move(self.board)
-            if not(self.__is_input_valid(row, col)):
+            if not self.__is_input_valid(row, col):
                 continue
             row = int(row)
             col = int(col)
             self.board[row][col] = self.player_symbol[which_player]
-            if (self.__have_we_a_winner((row, col))):
+            if self.__have_we_a_winner((row, col)):
                 self.__end_of_game(which_player)
                 result = which_player
                 break
             turn += 1
-            if (turn >= self.board_size[0] * self.board_size[1]):
+            if turn >= self.board_size[0] * self.board_size[1]:
                 self.__end_of_game(None)
                 break
         return result

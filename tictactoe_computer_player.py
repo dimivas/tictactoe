@@ -45,7 +45,7 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
         free_seats = []
         for i in range(len(game_state)):
             for j in range(len(game_state)):
-                if not(game_state[i][j]):
+                if not game_state[i][j]:
                     free_seats.append((i, j))
         return tuple(free_seats)
 
@@ -55,11 +55,11 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
         best_score = None
         for free_seat in self.__get_free_seats(game_state):
             next_game_state_score = self.__get_score(game_state, free_seat)
-            if (best_score is None):
+            if best_score is None:
                 best_score = next_game_state_score
                 best_move = free_seat
                 continue
-            if (next_game_state_score > best_score):
+            if next_game_state_score > best_score:
                 best_score = next_game_state_score
                 best_move = free_seat
         return best_move
@@ -76,18 +76,18 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
 
     def __init_q_values(self, game_state):
         encoded_state = self.__encode_state(game_state)
-        if (encoded_state not in self.q_values):
+        if encoded_state not in self.q_values:
             self.q_values[encoded_state] = self.INITIAL_STATE_VALUE
         for free_seat in self.__get_free_seats(game_state):
             next_encoded_state = self.__encode_state(self.__combine_state_and_seat(game_state, free_seat))
-            if (next_encoded_state not in self.q_values):
+            if next_encoded_state not in self.q_values:
                 self.q_values[next_encoded_state] = self.INITIAL_STATE_VALUE
 
 
     def __map_player_id(self, seat):
         internal_player_id = None
-        if (seat):
-            if (seat == self.player_id):
+        if seat:
+            if seat == self.player_id:
                 internal_player_id = self.COM_PLAYER_ID
             else:
                 internal_player_id = self.OPPONENT_PLAYER_ID
@@ -103,15 +103,15 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
 
 
     def __update_q_values(self, reward):
-        if (self.prev_game_state):
+        if self.prev_game_state:
             self.q_values[self.prev_game_state] += self.alpha * (reward - self.q_values[self.prev_game_state])
 
 
     def end_of_game(self, winning_player_id):
         reward = self.DRAW_REWARD
-        if (winning_player_id == self.player_id):
+        if winning_player_id == self.player_id:
             reward = self.COM_WIN_REWARD
-        elif (winning_player_id):
+        elif winning_player_id:
             reward = self.COM_LOSS_PENALTY
         self.__update_q_values(reward)
         self.__reset_state()
@@ -121,7 +121,7 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
         next_move = None
         self.__init_q_values(game_state)
 
-        if (random.random() < self.epsilon):
+        if random.random() < self.epsilon:
             next_move = self.__get_next_random_move(game_state)
             self.__update_epsilon()
         else:
@@ -135,7 +135,6 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
 
 
     def get_q_values_from_other_com(self, com_player):
-        assert(isinstance(com_player, TicTacToeComputerPlayer))
         for game_state in com_player.q_values:
             if game_state not in self.q_values:
                 self.q_values[game_state] = com_player.q_values[game_state]

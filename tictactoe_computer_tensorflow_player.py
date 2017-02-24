@@ -85,9 +85,9 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
 
     def end_of_game(self, winning_player_id):
         reward = self.DRAW_REWARD
-        if (winning_player_id == self.player_id):
+        if winning_player_id == self.player_id:
             reward = self.COM_WIN_REWARD
-        elif (winning_player_id):
+        elif winning_player_id:
             reward = self.COM_LOSS_PENALTY
 
         prev_splitted_states, prev_move_t = self.prev_game_state
