@@ -21,10 +21,9 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
     OPPONENT_PLAYER_ID = 2
 
 
-    def __init__(self, epsilon=1.0, epsilon_decay_step=0.9999, board_size=3, hidden_layer_size=50, be_verbose=False):
+    def __init__(self, epsilon=1.0, epsilon_decay_step=10e-5, board_size=3, hidden_layer_size=50):
         self.epsilon = epsilon
         self.epsilon_decay_step = epsilon_decay_step
-        self.be_verbose = be_verbose
 
         self.player_id = None
         self.prev_game_state = None
@@ -63,7 +62,7 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
 
 
     def __update_epsilon(self):
-        self.epsilon *= self.epsilon_decay_step
+        self.epsilon *= (1 - self.epsilon_decay_step)
 
 
     def __reset_state(self):

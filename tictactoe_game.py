@@ -170,6 +170,6 @@ class TicTacToeGame(object):
                 break
             turn += 1
             if turn >= self.board_size[0] * self.board_size[1]:
-                self.__end_of_game(None)
+                self.__end_of_game(self.RESULT_DRAW)
                 break
         return result
