@@ -1,6 +1,5 @@
 from __future__ import print_function
 
-import copy
 import random
 import time
 
@@ -36,7 +35,7 @@ class TicTacToeSimpleComputerPlayer(TicTacToePlayer):
     def __get_free_seats(self, game_state):
         free_seats = []
         for i in range(len(game_state)):
-            for j in range(len(game_state)):
+            for j in range(len(game_state[i])):
                 if not game_state[i][j]:
                     free_seats.append((i, j))
         return tuple(free_seats)
