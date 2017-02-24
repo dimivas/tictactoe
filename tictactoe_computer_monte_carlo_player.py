@@ -10,9 +10,9 @@ from tictactoe_player import TicTacToePlayer
 class TicTacToeSimpleComputerPlayer(TicTacToePlayer):
 
     INITIAL_STATE_VALUE = 0.5
-    COM_WINNING_STAKE = 1.0
-    OPPONENT_WINNING_STAKE = 0.0
-    DRAW_WINNING_STAKE = 0.5
+    COM_WIN_REWARD = 1.0
+    COM_LOSS_PENALTY = 0.0
+    DRAW_REWARD = 0.5
 
     COM_PLAYER_ID = 1
     OPPONENT_PLAYER_ID = 2
@@ -102,11 +102,11 @@ class TicTacToeSimpleComputerPlayer(TicTacToePlayer):
 
 
     def end_of_game(self, winning_player_id):
-        reward = self.DRAW_WINNING_STAKE
+        reward = self.DRAW_REWARD
         if (winning_player_id == self.player_id):
-            reward = self.COM_WINNING_STAKE
+            reward = self.COM_WIN_REWARD
         elif (winning_player_id):
-            reward = self.OPPONENT_WINNING_STAKE
+            reward = self.COM_LOSS_PENALTY
         self.__update_q_values(reward)
         self.__reset_state()
 
