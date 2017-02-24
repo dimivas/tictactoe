@@ -77,7 +77,8 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
         if encoded_state not in self.q_values:
             self.q_values[encoded_state] = self.INITIAL_STATE_VALUE
         for free_seat in self.__get_free_seats(game_state):
-            next_encoded_state = self.__encode_state(self.__apply_move_on_state(game_state, free_seat))
+            next_state = self.__apply_move_on_state(game_state, free_seat)
+            next_encoded_state = self.__encode_state(next_state)
             if next_encoded_state not in self.q_values:
                 self.q_values[next_encoded_state] = self.INITIAL_STATE_VALUE
 
@@ -102,7 +103,8 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
 
     def __update_q_values(self, reward):
         if self.prev_game_state:
-            self.q_values[self.prev_game_state] += self.alpha * (reward - self.q_values[self.prev_game_state])
+            learned_value = self.alpha * (reward - self.q_values[self.prev_game_state])
+            self.q_values[self.prev_game_state] += learned_value
 
 
     def end_of_game(self, winning_player_id):
@@ -128,7 +130,8 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
         next_game_state_score = self.__get_score(game_state, next_move)
         self.__update_q_values(next_game_state_score)
 
-        self.prev_game_state = self.__encode_state(self.__apply_move_on_state(game_state, next_move))
+        tmp_prev_game_state = self.__apply_move_on_state(game_state, next_move)
+        self.prev_game_state = self.__encode_state(tmp_prev_game_state)
         return next_move
 
 
