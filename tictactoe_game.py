@@ -1,7 +1,7 @@
 """
 The implementation of the Tic-Tac-Toe game engine
 """
-rom __future__ import print_function
+from __future__ import print_function
 
 import os
 
@@ -98,7 +98,7 @@ class TicTacToeGame(object):
         @return: boolean value        
         """
         result = False
-        if row[0] and all(map(lambda x: x == row[0], row)):
+        if line[0] and all(map(lambda x: x == line[0], line)):
             result = True
         return result
 
