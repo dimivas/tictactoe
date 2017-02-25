@@ -1,3 +1,6 @@
+"""
+Abstract class for Tic-Tac-Toe player component
+"""
 import abc
 
 class TicTacToePlayer(object):
