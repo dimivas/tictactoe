@@ -9,5 +9,5 @@ from players.tictactoe_computer_tensorflow import TicTacToeComputerTensorflow
 from players.tictactoe_human import TicTacToeHuman
 
 __all__ = ['TicTacToeComputerNaive', 'TicTacToeComputerQLearning',
-           'TicTacToeComputerRandom', 'TicTacToeComputerRandom',
+           'TicTacToeComputerRandom', 'TicTacToeComputerTensorflow',
            'TicTacToeHuman']
