@@ -9,10 +9,14 @@ import tensorflow as tf
 from tensorflow.contrib import layers
 from tensorflow.python.ops import nn
 
-from tictactoe_player import TicTacToePlayer
+from abstract_tictactoe_player import AbstractTicTacToePlayer
 
 
-class TicTacToeComputerPlayer(TicTacToePlayer):
+class TicTacToeComputerTensorflow(AbstractTicTacToePlayer):
+    """
+    The neural network implementation of the Tic-Tac-Toe player component
+    using Q-Learning and Tensorflow
+    """
 
     COM_WIN_REWARD = 1.0
     COM_LOSS_PENALTY = 0.0
@@ -41,13 +45,13 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         self.epsilon = epsilon
         self.epsilon_decay_step = epsilon_decay_step
 
-        self.player_id = None
-        self.prev_game_state = None
-
         self.board_size = board_size
         self.hidden_layer_size = hidden_layer_size
         self.learning_rate = learning_rate
         self.gamma = gamma
+
+        self.player_id = None
+        self.prev_game_state = None
 
         self.session = tf.Session()
         self.__init_graph()

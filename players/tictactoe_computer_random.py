@@ -8,10 +8,15 @@ from __future__ import print_function
 
 import random
 
-from tictactoe_player import TicTacToePlayer
+from abstract_tictactoe_player import AbstractTicTacToePlayer
 
 
-class TicTacToeRandomComputerPlayer(TicTacToePlayer):
+class TicTacToeComputerRandom(AbstractTicTacToePlayer):
+    """
+    The implementation of the Tic-Tac-Toe player component
+    that always selects a random move. The specific component
+    is used only for training and/or evaluation of other components.
+    """
 
     def __init__(self):
         """

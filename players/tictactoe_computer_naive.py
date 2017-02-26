@@ -1,14 +1,19 @@
 """
-The implementation of the Tic-Tac-Toe player component using Q-Learning
+The implementation of the Tic-Tac-Toe player component 
+using a naive version of Q-Learning
 """
 from __future__ import print_function
 
 import random
 
-from tictactoe_player import TicTacToePlayer
+from abstract_tictactoe_player import AbstractTicTacToePlayer
 
 
-class TicTacToeCComputerPlayer(TicTacToePlayer):
+class TicTacToeComputerNaive(AbstractTicTacToePlayer):
+    """
+    The implementation of the Tic-Tac-Toe player component 
+    using a naive version of Q-Learning
+    """
 
     INITIAL_STATE_VALUE = 0.5
     COM_WIN_REWARD = 1.0
@@ -19,35 +24,20 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
     OPPONENT_PLAYER_ID = 2
 
 
-    def __init__(self, alpha=0.99, epsilon=1.0, epsilon_decay_step=10e-5):
+    def __init__(self, epsilon=1.0, epsilon_decay_step=10e-5):
         """
         Constructor
 
-        @param alpha: the alpha parameter (learning rate) of the Q-Learning algorithm (0, 1]
         @param epsilon: the epsilon parameter (randomness of the next move)
                         of Q-Learning algorithm [0, 1]
         @param epsilon_decay_step: the decay factor for updating the epsilon parameter [0, 1]
         """
-        self.alpha = alpha
         self.epsilon = epsilon
         self.epsilon_decay_step = epsilon_decay_step
 
         self.q_values = {}
-        self.prev_game_state = None
+        self.game_moves_history = []
         self.player_id = None
-
-
-    def __apply_move_on_state(self, game_state, move):
-        """
-        Apply move on the current game state
-
-        @param game_state: a 2D list with the game state given by the game engine
-        @param move: a list with the x and y values of the move  
-        @return: a 2D list with the merged result
-        """
-        next_game_state = [x[:] for x in game_state]
-        next_game_state[move[0]][move[1]] = self.player_id
-        return next_game_state
 
 
     def __encode_state(self, game_state):
@@ -117,8 +107,7 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
         @move: a list with the x and y values of the selected move
         @return: the Q-Value
         """
-        next_game_state = self.__apply_move_on_state(game_state, move)
-        return self.q_values[self.__encode_state(next_game_state)]
+        return self.q_values[self.__encode_state(game_state)][move][0]
 
 
     def __init_q_values(self, game_state):
@@ -128,17 +117,15 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
         
         @param game_state: a 2D list with the game state
         """
-        encoded_state = self.__encode_state(game_state)
-        if encoded_state not in self.q_values:
-            self.q_values[encoded_state] = self.INITIAL_STATE_VALUE
+        encoded_game_state = self.__encode_state(game_state)
+        if encoded_game_state in self.q_values:
+            return
+        self.q_values[encoded_game_state] = {}
         for free_seat in self.__get_free_seats(game_state):
-            next_state = self.__apply_move_on_state(game_state, free_seat)
-            next_encoded_state = self.__encode_state(next_state)
-            if next_encoded_state not in self.q_values:
-                self.q_values[next_encoded_state] = self.INITIAL_STATE_VALUE
+            self.q_values[encoded_game_state][free_seat] = (self.INITIAL_STATE_VALUE, 0)
 
 
-    def __map_player_id(self, value):
+    def __map_player_id(self, seat):
         """
         Maps the symbol given by the game engine to an internal notation
 
@@ -146,8 +133,8 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
         @return: the mapped value
         """ 
         internal_player_id = None
-        if value:
-            if value == self.player_id:
+        if seat:
+            if seat == self.player_id:
                 internal_player_id = self.COM_PLAYER_ID
             else:
                 internal_player_id = self.OPPONENT_PLAYER_ID
@@ -158,7 +145,8 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
         """
         Reset state of the object
         """
-        self.prev_game_state = None
+        self.game_moves_history = []
+        self.player_id = None
 
 
     def __update_epsilon(self):
@@ -172,11 +160,12 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
         """
         Update Q-Values
 
-        @param reward: the reward for the last selected move
+        @param reward: the reward for all moves taken during the game
         """
-        if self.prev_game_state:
-            learned_value = self.alpha * (reward - self.q_values[self.prev_game_state])
-            self.q_values[self.prev_game_state] += learned_value
+        for encoded_game_state, move in self.game_moves_history:
+            value, times_passed = self.q_values[encoded_game_state][move]
+            new_value = (value * times_passed + float(reward)) / (times_passed + 1)
+            self.q_values[encoded_game_state][move] = (new_value, times_passed + 1)
 
 
     def end_of_game(self, winning_player_id):
@@ -202,6 +191,8 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
         @return: a list with the x and y values of the selected seat
         """
         next_move = None
+        encoded_game_state = self.__encode_state(game_state)
+
         self.__init_q_values(game_state)
 
         if random.random() < self.epsilon:
@@ -210,23 +201,20 @@ class TicTacToeCComputerPlayer(TicTacToePlayer):
         else:
             next_move = self.__get_next_greedy_move(game_state)
 
-        next_game_state_score = self.__get_score(game_state, next_move)
-        self.__update_q_values(next_game_state_score)
+        self.game_moves_history.append((encoded_game_state, next_move))
 
-        tmp_prev_game_state = self.__apply_move_on_state(game_state, next_move)
-        self.prev_game_state = self.__encode_state(tmp_prev_game_state)
         return next_move
 
 
-    def get_q_values_from_other_com(self, com_player):
+    def get_q_values_from_other_com(self, other_player):
         """
         Merges the learned Q-Values taken by an other instance of the player
 
         @param com_player: instance of the other player
         """
-        for game_state in com_player.q_values:
+        for game_state in other_player.q_values:
             if game_state not in self.q_values:
-                self.q_values[game_state] = com_player.q_values[game_state]
+                self.q_values[game_state] = other_player.q_values[game_state]
 
 
     def set_player_id(self, player_id):
