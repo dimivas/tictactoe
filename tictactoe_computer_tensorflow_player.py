@@ -25,7 +25,8 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
     OPPONENT_PLAYER_ID = 2
 
 
-    def __init__(self, epsilon=1.0, epsilon_decay_step=10e-5, board_size=3, hidden_layer_size=50):
+    def __init__(self, epsilon=1.0, epsilon_decay_step=10e-5, board_size=3, hidden_layer_size=20,
+                 learning_rate=0.001, gamma=0.999):
         """
         Constructor
 
@@ -34,6 +35,8 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         @param epsilon_decay_step: the decay factor for updating the epsilon parameter [0, 1]
         @param board_size: a list with the number of rows and columns of the game board
         @param hidden_layer_size: the number of nodes in the hidden layer
+        @param learning_rate:
+        @param gamma: the gamma parameter (discount factor) of Q-Learning algorithm [0, 1] 
         """
         self.epsilon = epsilon
         self.epsilon_decay_step = epsilon_decay_step
@@ -43,6 +46,8 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
 
         self.board_size = board_size
         self.hidden_layer_size = hidden_layer_size
+        self.learning_rate = learning_rate
+        self.gamma = gamma
 
         self.session = tf.Session()
         self.__init_graph()
@@ -62,12 +67,17 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         net = layers.fully_connected(net, self.board_size*self.board_size, activation_fn=None)
 
         self.q_values_nn = tf.reshape(net, [-1, self.board_size, self.board_size])
-        self.a = tf.placeholder(tf.float32, [None, self.board_size, self.board_size], name="a")
-        self.y = tf.placeholder(tf.float32, [None], name="y")
-        action_q_values = tf.reduce_sum(tf.mul(self.q_values_nn, self.a), reduction_indices=[1, 2])
-        self.loss = tf.reduce_mean(tf.square(self.y - action_q_values))
-        optimizer = tf.train.AdamOptimizer(0.001)
-        self.q_updater = optimizer.minimize(self.loss, var_list=tf.trainable_variables())
+
+        self.move = tf.placeholder(tf.float32, [None, self.board_size, self.board_size], name="move")
+
+        self.learned_value = tf.placeholder(tf.float32, [None], name="learned_value")
+
+        action_q_values = tf.reduce_sum(tf.mul(self.q_values_nn, self.move), reduction_indices=[1, 2])
+
+        loss = tf.reduce_mean(tf.square(self.learned_value - action_q_values))
+        optimizer = tf.train.AdamOptimizer(self.learning_rate)
+        #optimizer = tf.train.GradientDescentOptimizer(self.learning_rate)
+        self.q_updater = optimizer.minimize(loss, var_list=tf.trainable_variables())
 
         self.session.run(tf.initialize_all_variables())
 
@@ -147,18 +157,18 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         self.epsilon *= (1. - self.epsilon_decay_step)
 
 
-    def __update_q_values(self, s_t, a_t, y_t):
+    def __update_q_values(self, splitted_state_t, move_t, learned_value_t):
         """
         Update Q-Values
 
-        @param s_t: splitted game state
-        @param a_t: 
-        @param y_t:
+        @param splitted_state_t: splitted game state tensor
+        @param move_t: previous move tensor
+        @param learned_value_t: learned_value tensor
         """
         self.session.run(self.q_updater, 
-                         feed_dict={self.splitted_states: s_t, 
-                                    self.a: a_t, 
-                                    self.y: y_t})
+                         feed_dict={self.splitted_states: splitted_state_t, 
+                                    self.move: move_t, 
+                                    self.learned_value: learned_value_t})
 
 
     def end_of_game(self, winning_player_id):
@@ -176,8 +186,8 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
         prev_splitted_states, prev_move_t = self.prev_game_state
         prev_splitted_states = [prev_splitted_states]
         prev_move_t = [prev_move_t]
-        reward = [reward] * len(prev_splitted_states)
-        self.__update_q_values(prev_splitted_states, prev_move_t, reward)
+        reward_t = [reward] * len(prev_splitted_states)
+        self.__update_q_values(prev_splitted_states, prev_move_t, reward_t)
         
         self.__reset()
 
@@ -207,11 +217,11 @@ class TicTacToeComputerPlayer(TicTacToePlayer):
 
         if self.prev_game_state:
             prev_splitted_states, prev_move_t = self.prev_game_state
-            y_t_prev = 0. + 0.8 * q_values[best_next_move]
+            learned_value = self.gamma * q_values[best_next_move]
             prev_splitted_states = [prev_splitted_states]
             prev_move_t = [prev_move_t]
-            y_t_prev = [y_t_prev] * len(prev_splitted_states)
-            self.__update_q_values(prev_splitted_states, prev_move_t, y_t_prev)
+            learned_value_t = [learned_value] * len(prev_splitted_states)
+            self.__update_q_values(prev_splitted_states, prev_move_t, learned_value_t)
 
         next_move_t = np.zeros_like(encoded_state, dtype=np.float32)
         next_move_t[next_move] = 1.
