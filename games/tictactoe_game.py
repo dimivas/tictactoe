@@ -11,13 +11,13 @@ class TicTacToeGame(object):
     RESULT_DRAW = None
 
 
-    def __init__(self, p1, p2, board_size=(3, 3), win_size=3, player_symbol=('X', 'O'), be_verbose=True):
+    def __init__(self, p1, p2, board_size=3, win_size=3, player_symbol=('X', 'O'), be_verbose=True):
         """
         Constructor
 
         @param p1: the instance of Player 1
         @param p2: the instance of Player 2
-        @board_size: a list with the number of rows and columns of the board (row, col >= 3)
+        @board_size: the number of rows and columns of the board (>= 3)
         @win_size: the winning line size. This value should be equal or less than 
                    the number of rows and columns of the board and at least 3 
         @player_symbol: a list with the players' symbol
@@ -39,7 +39,7 @@ class TicTacToeGame(object):
         """
         Initialize game board with default value
         """
-        self.board = map(lambda x: [None] * self.board_size[1], range(self.board_size[0]))
+        self.board = map(lambda x: [None] * self.board_size, range(self.board_size))
 
 
     def print_board(self):
@@ -49,8 +49,8 @@ class TicTacToeGame(object):
         if not self.be_verbose:
             return
         os.system('clear')
-        print("  {}".format(" ".join(str(x) for x in range(self.board_size[1]))))
-        for line_id in range(self.board_size[0]):
+        print("  {}".format(" ".join(str(x) for x in range(self.board_size))))
+        for line_id in range(self.board_size):
             line_state = " ".join(map(lambda x: x and str(x) or '-', self.board[line_id]))
             print("{} {}".format(line_id, line_state))
         print()
@@ -80,9 +80,9 @@ class TicTacToeGame(object):
         else:
             row = int(row)
             col = int(col)
-            if row < 0 or row >= self.board_size[0]:
+            if row < 0 or row >= self.board_size:
                 result = False
-            if col < 0 or col >= self.board_size[1]:
+            if col < 0 or col >= self.board_size:
                 result = False
         if result:
             if self.__is_seat_occupied((row, col)):
@@ -139,10 +139,10 @@ class TicTacToeGame(object):
         @return: boolean value
         """
         x_start = max(last_move[0] - (self.win_size - 1), 0)
-        x_end = min(last_move[0] + (self.win_size - 1), self.board_size[0] - 1)
+        x_end = min(last_move[0] + (self.win_size - 1), self.board_size - 1)
 
         y_start = max(last_move[1] - (self.win_size - 1), 0)
-        y_end = min(last_move[1] + (self.win_size - 1), self.board_size[1] - 1)
+        y_end = min(last_move[1] + (self.win_size - 1), self.board_size - 1)
 
         for i in range(x_start, x_end - (self.win_size - 2)):
             for j in range(y_start, y_end - (self.win_size - 2)):
@@ -192,7 +192,7 @@ class TicTacToeGame(object):
                 result = which_player
                 break
             turn += 1
-            if turn >= self.board_size[0] * self.board_size[1]:
+            if turn >= self.board_size * self.board_size:
                 self.__end_of_game(self.RESULT_DRAW)
                 break
         return result
