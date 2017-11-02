@@ -76,7 +76,7 @@ class TicTacToeComputerTensorflow(AbstractTicTacToePlayer):
 
         self.learned_value = tf.placeholder(tf.float32, [None], name="learned_value")
 
-        action_q_values = tf.reduce_sum(tf.mul(self.q_values_nn, self.move), reduction_indices=[1, 2])
+        action_q_values = tf.reduce_sum(tf.multiply(self.q_values_nn, self.move), reduction_indices=[1, 2])
 
         loss = tf.reduce_mean(tf.square(self.learned_value - action_q_values))
         optimizer = tf.train.AdamOptimizer(self.learning_rate)
