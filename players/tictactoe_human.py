@@ -30,7 +30,7 @@ class TicTacToeHuman(AbstractTicTacToePlayer):
         """
         print("Player {}: ".format(self.player_id), end="")
         player_input = raw_input()
-        row, col = map(lambda x: str(x).strip(), player_input.split(','))
+        row, col = [str(x).strip() for x in player_input.split(',')]
         return (row, col)
 
 

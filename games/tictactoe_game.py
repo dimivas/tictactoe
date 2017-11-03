@@ -39,7 +39,7 @@ class TicTacToeGame(object):
         """
         Initialize game board with default value
         """
-        self.board = map(lambda x: [None] * self.board_size, range(self.board_size))
+        self.board = [[None] * self.board_size for _ in range(self.board_size)]
 
 
     def print_board(self):
@@ -51,7 +51,7 @@ class TicTacToeGame(object):
         os.system('clear')
         print("  {}".format(" ".join(str(x) for x in range(self.board_size))))
         for line_id in range(self.board_size):
-            line_state = " ".join(map(lambda x: x and str(x) or '-', self.board[line_id]))
+            line_state = " ".join(x and str(x) or '-' for x in self.board[line_id])
             print("{} {}".format(line_id, line_state))
         print()
 
@@ -98,7 +98,7 @@ class TicTacToeGame(object):
         @return: boolean value        
         """
         result = False
-        if line[0] and all(map(lambda x: x == line[0], line)):
+        if line[0] and all(x == line[0] for x in line):
             result = True
         return result
 
@@ -112,20 +112,20 @@ class TicTacToeGame(object):
         @return: boolean value
         """
         # Left to right cross
-        left_cross = map(lambda x: self.board[start_row + x][start_col + x], range(self.win_size))
+        left_cross = [self.board[start_row + x][start_col + x] for x in range(self.win_size)]
         if self.__have_we_a_winner_in_line(left_cross):
             return True
         # Right to left cross
-        right_cross = map(lambda x: self.board[start_row + x][start_col + self.win_size - 1 - x], 
-                          range(self.win_size))
+        right_cross = [self.board[start_row + x][start_col + self.win_size - 1 - x] \
+                          for x in range(self.win_size)]
         if self.__have_we_a_winner_in_line(right_cross):
             return True
         for i in range(self.win_size):
             offset_row = self.board[i + start_row][start_col:start_col + self.win_size]
             if self.__have_we_a_winner_in_line(offset_row):
                 return True
-            offset_col = map(lambda x: x[i + start_col], 
-                             self.board[start_row:start_row + self.win_size])
+            offset_col = [x[i + start_col] \
+                             for x in self.board[start_row:start_row + self.win_size]]
             if self.__have_we_a_winner_in_line(offset_col):
                 return True
         return False
