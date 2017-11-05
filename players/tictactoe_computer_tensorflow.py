@@ -93,7 +93,7 @@ class TicTacToeComputerTensorflow(AbstractTicTacToePlayer):
         @param game_state: a 2D list with the game state given by the game engine
         @return: a 2D numpy array with the internal representation of the game state
         """
-        encoded_state = map(self.__map_player_id, np.array(game_state).flatten())
+        encoded_state = tuple(map(self.__map_player_id, np.array(game_state).flatten()))
         encoded_state = np.array(encoded_state, float).reshape(self.board_size, self.board_size)
         return encoded_state
 
