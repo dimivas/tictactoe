@@ -9,7 +9,7 @@ import tensorflow as tf
 from tensorflow.contrib import layers
 from tensorflow.python.ops import nn
 
-from abstract_tictactoe_player import AbstractTicTacToePlayer
+from .abstract_tictactoe_player import AbstractTicTacToePlayer
 
 
 class TicTacToeComputerTensorflow(AbstractTicTacToePlayer):

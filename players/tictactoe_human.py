@@ -4,7 +4,7 @@ This component receives the next move as an input from a human player.
 """
 from __future__ import print_function
 
-from abstract_tictactoe_player import AbstractTicTacToePlayer
+from .abstract_tictactoe_player import AbstractTicTacToePlayer
 
 
 class TicTacToeHuman(AbstractTicTacToePlayer):

@@ -8,7 +8,7 @@ from __future__ import print_function
 
 import random
 
-from abstract_tictactoe_player import AbstractTicTacToePlayer
+from .abstract_tictactoe_player import AbstractTicTacToePlayer
 
 
 class TicTacToeComputerRandom(AbstractTicTacToePlayer):
