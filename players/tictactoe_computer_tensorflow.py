@@ -83,7 +83,7 @@ class TicTacToeComputerTensorflow(AbstractTicTacToePlayer):
         #optimizer = tf.train.GradientDescentOptimizer(self.learning_rate)
         self.q_updater = optimizer.minimize(loss, var_list=tf.trainable_variables())
 
-        self.session.run(tf.initialize_all_variables())
+        self.session.run(tf.global_variables_initializer())
 
 
     def __encode_state(self, game_state):
