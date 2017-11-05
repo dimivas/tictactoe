@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from datetime import datetime
-from optparse import OptionParser
+import argparse
 import sys
 import time
 
@@ -44,38 +44,33 @@ def main(p1_class, p2_class, num_of_training_games, num_of_test_games, play_afte
     if (play_after_test): 
         human = TicTacToeHuman()
 
-
-parser = OptionParser()
-parser.add_option('-1', '--p1',
-                      type='choice',
+parser = argparse.ArgumentParser(description='Implementation of Tic-Tac-Toe Agents using Reinforcement Learning techniques')
+parser.add_argument('-1', '--p1',
                       action='store',
                       dest='p1',
                       choices=all_players.keys(),
+                      required=True,
                       help='Type of Player 1',)
-parser.add_option('-2', '--p2',
-                      type='choice',
+parser.add_argument('-2', '--p2',
                       action='store',
                       dest='p2',
                       choices=all_players.keys(),
+                      required=True,
                       help='Type of Player 2',)
-parser.add_option('-n', '--number-of-training-games',
-                      type='int',
+parser.add_argument('-n', '--number-of-training-games',
+                      type=int,
                       action='store',
                       dest='number_of_training_games',
                       default=5000,
                       help='Number of training games',)
-parser.add_option('-t', '--number-of-test-games',
-                      type='int',
+parser.add_argument('-t', '--number-of-test-games',
+                      type=int,
                       action='store',
                       dest='number_of_test_games',
                       default=1000,
                       help='Number of test games',)
 
-(options, args) = parser.parse_args()
-if not options.p1:
-    parser.error('P1 not given')
-if not options.p2:
-    parser.error('P2 not given')
-main(options.p1, options.p2, 
-     options.number_of_training_games,
-     options.number_of_test_games)
+args = parser.parse_args()
+main(args.p1, args.p2, 
+     args.number_of_training_games,
+     args.number_of_test_games)
