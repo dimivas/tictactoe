@@ -16,7 +16,7 @@ The algorithms created in this project are mostly based on Q-Learning techniques
  - python 2.7 or 3
  - tensorflow 1.0 or later
  - numpy 1.11.0 or later
- - optparse
+ - argparse
  
  
 This project was presented as the Capstone Project for the Machine Learning Engineer Nanodegree. You may find a full report in [docs/ProjectReport.pdf](docs/ProjectReport.pdf)
