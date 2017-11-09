@@ -3,6 +3,7 @@ The implementation of the Tic-Tac-Toe human interface.
 This component receives the next move as an input from a human player.
 """
 from __future__ import print_function
+import sys
 
 from .abstract_tictactoe_player import AbstractTicTacToePlayer
 
@@ -19,6 +20,10 @@ class TicTacToeHuman(AbstractTicTacToePlayer):
         Constructor
         """
         self.player_id = None
+        if sys.version_info.major == 2:
+            self.__input_func = raw_input
+        else:
+            self.__input_func = input
 
 
     def __get_next_move(self, game_state):
@@ -29,7 +34,7 @@ class TicTacToeHuman(AbstractTicTacToePlayer):
         @return: a list with the x and y values of the selected seat
         """
         print("Player {}: ".format(self.player_id), end="")
-        player_input = raw_input()
+        player_input = self.__input_func()
         row, col = [str(x).strip() for x in player_input.split(',')]
         return (row, col)
 
