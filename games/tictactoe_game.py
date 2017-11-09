@@ -30,8 +30,7 @@ class TicTacToeGame(object):
 
         self.players = (p1, p2)
         self.game_id = 0
-
-        map(lambda x: self.players[x].set_player_id(self.player_symbol[x]), range(len(self.players)))
+        [self.players[x].set_player_id(self.player_symbol[x]) for x in range(len(self.players))]
         self.__init_board()
 
 
@@ -163,11 +162,11 @@ class TicTacToeGame(object):
             if self.be_verbose: 
                 print("Game {}: Player {} is the winner!".format(self.game_id, winning_player + 1))
             winning_player_symbol = self.player_symbol[winning_player]
-            map(lambda x: x.end_of_game(winning_player_symbol), self.players)
+            [x.end_of_game(winning_player_symbol) for x in self.players]
         else:
             if self.be_verbose:
                 print("Game {}: This is a draw!".format(self.game_id))
-            map(lambda x: x.end_of_game(self.RESULT_DRAW), self.players)          
+            [x.end_of_game(self.RESULT_DRAW) for x in self.players]
         self.__init_board()
 
 
