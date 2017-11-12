@@ -21,3 +21,10 @@ The algorithms created in this project are mostly based on Q-Learning techniques
  
 This project was presented as the Capstone Project for the Machine Learning Engineer Nanodegree. You may find a full report in [docs/ProjectReport.pdf](docs/ProjectReport.pdf)
 
+
+## Docker image
+
+Give it a try:
+'''
+docker run -i -t dimivas/tictactoe
+'''
