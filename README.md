@@ -25,6 +25,6 @@ This project was presented as the Capstone Project for the Machine Learning Engi
 ## Docker image
 
 Give it a try:
-'''
+```
 docker run -i -t dimivas/tictactoe
-'''
+```
